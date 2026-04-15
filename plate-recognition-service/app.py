@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-MODELS_PATH = os.path.join(BASE_DIR, 'CarPlateDetection', 'CarPlateDetection', 'models')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODELS_PATH = os.path.join(BASE_DIR, 'models')
 MODEL_PATH = os.path.join(MODELS_PATH, 'best.pt')
-FONT_PATH = os.path.join(BASE_DIR, 'CarPlateDetection', 'CarPlateDetection', 'Font', 'platech.ttf')
+FONT_PATH = os.path.join(BASE_DIR, 'fonts', 'platech.ttf')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 logger.info(f"Using device: {device}")
