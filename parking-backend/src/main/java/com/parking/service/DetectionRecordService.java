@@ -154,7 +154,7 @@ public class DetectionRecordService {
             vehicleInfo = new VehicleInfo();
             vehicleInfo.setPlateNumber(record.getPlateNumber());
             vehicleInfo.setPlateColor(record.getPlateColor());
-            vehicleInfo.setVehicleType(record.getPlateType());
+            vehicleInfo.setVehicleType(record.getVehicleType());
             vehicleInfo.setImageUrl(record.getImageUrl());
             vehicleInfo.setConfidence(record.getConfidence());
             

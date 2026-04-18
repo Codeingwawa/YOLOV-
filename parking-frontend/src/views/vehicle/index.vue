@@ -65,8 +65,20 @@
                 <el-tag type="primary">{{ row.plateNumber }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="plateColor" label="车牌颜色" width="100" />
-            <el-table-column prop="vehicleType" label="车型" width="100" />
+            <el-table-column prop="plateColor" label="车牌颜色" width="100">
+              <template #default="{ row }">
+                <el-tag v-if="row.plateColor" :type="getPlateColorType(row.plateColor)" size="small">
+                  {{ row.plateColor }}
+                </el-tag>
+                <span v-else class="text-gray">-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="vehicleType" label="车型" width="100">
+              <template #default="{ row }">
+                <span v-if="row.vehicleType">{{ row.vehicleType }}</span>
+                <span v-else class="text-gray">-</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="category" label="分类" width="100">
               <template #default="{ row }">
                 {{ getCategoryLabel(row.category) }}
@@ -462,6 +474,14 @@ const getCategoryLabel = (category) => {
   return labels[category] || category || '-'
 }
 
+const getPlateColorType = (plateColor) => {
+  if (plateColor.includes('绿')) return 'success'
+  if (plateColor.includes('黄')) return 'warning'
+  if (plateColor.includes('白')) return 'info'
+  if (plateColor.includes('黑')) return ''
+  return 'primary'
+}
+
 const determineCategory = (plateColor, vehicleType) => {
   if (plateColor && plateColor.includes('绿')) {
     return 'NEW_ENERGY'
@@ -523,6 +543,7 @@ const handleImageDetect = async (file) => {
       recordFormData.append('plateNumber', data.plateNumber)
       recordFormData.append('plateColor', data.plateColor || '')
       recordFormData.append('plateType', data.plateType || '')
+      recordFormData.append('vehicleType', data.vehicleType || '')
       recordFormData.append('confidence', data.confidence || 0)
       recordFormData.append('source', '图片检测')
       

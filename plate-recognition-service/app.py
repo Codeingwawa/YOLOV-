@@ -74,6 +74,35 @@ camera_streams = {}
 camera_lock = threading.Lock()
 
 
+def detect_plate_color(crop_img):
+    if crop_img is None or crop_img.size == 0:
+        return '蓝牌', '普通'
+    
+    hsv = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
+    
+    green_lower = np.array([35, 43, 46])
+    green_upper = np.array([77, 255, 255])
+    green_mask = cv2.inRange(hsv, green_lower, green_upper)
+    green_ratio = np.sum(green_mask > 0) / (crop_img.shape[0] * crop_img.shape[1])
+    
+    blue_lower = np.array([100, 43, 46])
+    blue_upper = np.array([124, 255, 255])
+    blue_mask = cv2.inRange(hsv, blue_lower, blue_upper)
+    blue_ratio = np.sum(blue_mask > 0) / (crop_img.shape[0] * crop_img.shape[1])
+    
+    yellow_lower = np.array([26, 43, 46])
+    yellow_upper = np.array([34, 255, 255])
+    yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+    yellow_ratio = np.sum(yellow_mask > 0) / (crop_img.shape[0] * crop_img.shape[1])
+    
+    if green_ratio > 0.15:
+        return '绿牌', '新能源'
+    elif yellow_ratio > 0.15:
+        return '黄牌', '大型车'
+    else:
+        return '蓝牌', '普通'
+
+
 def detect_vehicle_type(image_array):
     results = vehicle_model(image_array, conf=0.25, iou=0.7, classes=[1, 2, 3, 5, 7])[0]
     
@@ -113,6 +142,8 @@ def recognize_plate(image_array):
         x1, y1, x2, y2 = location
         crop_img = image_array[y1:y2, x1:x2]
         
+        plate_color, plate_type = detect_plate_color(crop_img)
+        
         ocr_result = ocr.ocr(crop_img, cls=True)
         
         if ocr_result and ocr_result[0]:
@@ -126,8 +157,8 @@ def recognize_plate(image_array):
         result = {
             'plateNumber': plate_number,
             'confidence': round(confidence * 100, 2),
-            'plateColor': PLATE_COLORS.get(cls, '未知'),
-            'plateType': PLATE_TYPES.get(cls, '普通'),
+            'plateColor': plate_color,
+            'plateType': plate_type,
             'location': location
         }
         
