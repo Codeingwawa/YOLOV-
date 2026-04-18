@@ -295,7 +295,9 @@
         <el-empty v-if="cameraResults.length === 0" description="暂无检测结果" :image-size="60" />
         <div v-else>
           <el-tag v-for="(result, index) in cameraResults" :key="index" style="margin: 5px;" type="success">
-            {{ result.plateNumber }} ({{ result.confidence }}%)
+            {{ result.plateNumber }} 
+            <span v-if="result.vehicleType && result.vehicleType !== '未知'" style="margin-left: 4px;">[{{ result.vehicleType }}]</span>
+            ({{ result.confidence }}%)
           </el-tag>
         </div>
       </div>
