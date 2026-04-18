@@ -215,10 +215,9 @@
         </el-descriptions-item>
         <el-descriptions-item label="置信度">{{ recognitionResult.confidence }}%</el-descriptions-item>
         <el-descriptions-item label="车牌颜色">{{ recognitionResult.plateColor }}</el-descriptions-item>
-        <el-descriptions-item label="车牌类型">{{ recognitionResult.plateType }}</el-descriptions-item>
-        <el-descriptions-item label="车型识别">
-          <el-tag :type="recognitionResult.vehicleType !== '未知' ? 'success' : 'info'">
-            {{ recognitionResult.vehicleType }}
+        <el-descriptions-item label="车型">
+          <el-tag :type="recognitionResult.vehicleType && recognitionResult.vehicleType !== '未知' ? 'success' : 'info'">
+            {{ recognitionResult.vehicleType || '未知' }}
           </el-tag>
           <span v-if="recognitionResult.vehicleConfidence > 0" style="margin-left: 8px; color: #909399;">
             (置信度: {{ recognitionResult.vehicleConfidence }}%)
