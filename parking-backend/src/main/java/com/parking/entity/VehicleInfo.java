@@ -56,10 +56,7 @@ public class VehicleInfo {
     
     public enum VehicleCategory {
         NEW_ENERGY,
-        FUEL,
-        TRUCK,
-        BUS,
-        OTHER
+        FUEL
     }
     
     @PrePersist

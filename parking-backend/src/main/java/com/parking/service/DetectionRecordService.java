@@ -206,15 +206,6 @@ public class DetectionRecordService {
             }
         }
         
-        if (category == VehicleCategory.TRUCK || category == VehicleCategory.BUS) {
-            Optional<ParkingSpace> largeSpace = availableSpaces.stream()
-                .filter(s -> s.getType() == ParkingSpace.SpaceType.LARGE)
-                .findFirst();
-            if (largeSpace.isPresent()) {
-                return largeSpace.get();
-            }
-        }
-        
         return availableSpaces.stream()
             .filter(s -> s.getType() == ParkingSpace.SpaceType.STANDARD)
             .findFirst()
@@ -222,14 +213,6 @@ public class DetectionRecordService {
     }
     
     private VehicleCategory determineCategory(String plateColor, String vehicleType) {
-        if (vehicleType != null) {
-            if (vehicleType.contains("卡车") || vehicleType.equalsIgnoreCase("TRUCK")) {
-                return VehicleCategory.TRUCK;
-            }
-            if (vehicleType.contains("公交") || vehicleType.contains("大巴") || vehicleType.equalsIgnoreCase("BUS")) {
-                return VehicleCategory.BUS;
-            }
-        }
         if (plateColor != null && plateColor.contains("绿")) {
             return VehicleCategory.NEW_ENERGY;
         }

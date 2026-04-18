@@ -46,9 +46,6 @@
               <el-select v-model="searchForm.category" placeholder="请选择分类" clearable style="width: 150px">
                 <el-option label="新能源" value="NEW_ENERGY" />
                 <el-option label="油车" value="FUEL" />
-                <el-option label="卡车" value="TRUCK" />
-                <el-option label="公交车/大巴" value="BUS" />
-                <el-option label="其他" value="OTHER" />
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -226,9 +223,6 @@
           <el-select v-model="selectedCategory" placeholder="选择分类">
             <el-option label="新能源" value="NEW_ENERGY" />
             <el-option label="油车" value="FUEL" />
-            <el-option label="卡车" value="TRUCK" />
-            <el-option label="公交车/大巴" value="BUS" />
-            <el-option label="其他" value="OTHER" />
           </el-select>
         </el-descriptions-item>
       </el-descriptions>
@@ -262,9 +256,6 @@
           <el-select v-model="editForm.category" placeholder="选择分类">
             <el-option label="新能源" value="NEW_ENERGY" />
             <el-option label="油车" value="FUEL" />
-            <el-option label="卡车" value="TRUCK" />
-            <el-option label="公交车/大巴" value="BUS" />
-            <el-option label="其他" value="OTHER" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注">
@@ -453,23 +444,12 @@ const isExpiringSoon = (endTime) => {
 const getCategoryLabel = (category) => {
   const labels = {
     NEW_ENERGY: '新能源',
-    FUEL: '油车',
-    TRUCK: '卡车',
-    BUS: '公交车/大巴',
-    OTHER: '其他'
+    FUEL: '油车'
   }
   return labels[category] || category || '-'
 }
 
 const determineCategory = (plateColor, vehicleType) => {
-  if (vehicleType) {
-    if (vehicleType.includes('卡车') || vehicleType.toUpperCase() === 'TRUCK') {
-      return 'TRUCK'
-    }
-    if (vehicleType.includes('公交') || vehicleType.includes('大巴') || vehicleType.toUpperCase() === 'BUS') {
-      return 'BUS'
-    }
-  }
   if (plateColor && plateColor.includes('绿')) {
     return 'NEW_ENERGY'
   }
