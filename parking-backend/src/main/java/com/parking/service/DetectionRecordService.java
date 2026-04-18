@@ -44,7 +44,8 @@ public class DetectionRecordService {
     
     @Transactional
     public DetectionRecord saveDetectionRecord(String plateNumber, String plateColor, 
-                                                String plateType, Double confidence, 
+                                                String plateType, String vehicleType,
+                                                Double confidence, 
                                                 String source, MultipartFile image) throws IOException {
         
         String imagePath = null;
@@ -56,6 +57,7 @@ public class DetectionRecordService {
         record.setPlateNumber(plateNumber);
         record.setPlateColor(plateColor);
         record.setPlateType(plateType);
+        record.setVehicleType(vehicleType);
         record.setConfidence(confidence);
         record.setSource(source);
         record.setImageUrl(imagePath);
@@ -78,6 +80,7 @@ public class DetectionRecordService {
         record.setPlateNumber(recognitionResult.getPlateNumber());
         record.setPlateColor(recognitionResult.getPlateColor());
         record.setPlateType(recognitionResult.getPlateType());
+        record.setVehicleType(recognitionResult.getVehicleType());
         record.setConfidence(recognitionResult.getConfidence());
         record.setSource(source);
         record.setImageUrl(imagePath);

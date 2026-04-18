@@ -40,12 +40,13 @@ public class DetectionRecordController {
             @RequestParam("plateNumber") String plateNumber,
             @RequestParam(value = "plateColor", required = false) String plateColor,
             @RequestParam(value = "plateType", required = false) String plateType,
+            @RequestParam(value = "vehicleType", required = false) String vehicleType,
             @RequestParam(value = "confidence", required = false) Double confidence,
             @RequestParam(value = "source", defaultValue = "手动录入") String source,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
         
         DetectionRecord record = detectionRecordService.saveDetectionRecord(
-            plateNumber, plateColor, plateType, confidence, source, image
+            plateNumber, plateColor, plateType, vehicleType, confidence, source, image
         );
         return ResponseEntity.ok(record);
     }

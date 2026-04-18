@@ -35,6 +35,11 @@ model = YOLO(MODEL_PATH, task='detect')
 model(np.zeros((48, 48, 3)).astype(np.uint8), device=device)
 logger.info("YOLO model loaded successfully")
 
+logger.info("Loading vehicle detection model...")
+vehicle_model = YOLO('yolov8n.pt', task='detect')
+vehicle_model(np.zeros((48, 48, 3)).astype(np.uint8), device=device)
+logger.info("Vehicle detection model loaded successfully")
+
 logger.info("Loading PaddleOCR model...")
 ocr = PaddleOCR(use_angle_cls=True, lang="ch", det=True)
 logger.info("PaddleOCR model loaded successfully")
@@ -49,8 +54,46 @@ PLATE_TYPES = {
     1: '普通'
 }
 
+VEHICLE_CLASSES = {
+    1: '自行车',
+    2: '轿车',
+    3: '摩托车',
+    5: '公交车',
+    7: '卡车'
+}
+
+VEHICLE_CATEGORY_MAP = {
+    '轿车': 'SEDAN',
+    '公交车': 'BUS',
+    '卡车': 'TRUCK',
+    '摩托车': 'MOTORCYCLE',
+    '自行车': 'OTHER'
+}
+
 camera_streams = {}
 camera_lock = threading.Lock()
+
+
+def detect_vehicle_type(image_array):
+    results = vehicle_model(image_array, conf=0.25, iou=0.7, classes=[1, 2, 3, 5, 7])[0]
+    
+    vehicle_types = []
+    for box in results.boxes:
+        cls_id = int(box.cls[0])
+        conf = float(box.conf[0])
+        x1, y1, x2, y2 = map(int, box.xyxy[0])
+        
+        vehicle_name = VEHICLE_CLASSES.get(cls_id, '未知')
+        vehicle_types.append({
+            'type': vehicle_name,
+            'category': VEHICLE_CATEGORY_MAP.get(vehicle_name, 'OTHER'),
+            'confidence': round(conf * 100, 2),
+            'location': [x1, y1, x2, y2]
+        })
+    
+    if vehicle_types:
+        return max(vehicle_types, key=lambda x: x['confidence'])
+    return None
 
 
 def recognize_plate(image_array):
@@ -61,6 +104,8 @@ def recognize_plate(image_array):
     
     cls_list = results.boxes.cls.tolist()
     cls_list = [int(i) for i in cls_list]
+    
+    vehicle_info = detect_vehicle_type(image_array)
     
     plate_results = []
     
@@ -78,13 +123,24 @@ def recognize_plate(image_array):
             plate_number = "无法识别"
             confidence = 0.0
         
-        plate_results.append({
+        result = {
             'plateNumber': plate_number,
             'confidence': round(confidence * 100, 2),
             'plateColor': PLATE_COLORS.get(cls, '未知'),
             'plateType': PLATE_TYPES.get(cls, '普通'),
             'location': location
-        })
+        }
+        
+        if vehicle_info:
+            result['vehicleType'] = vehicle_info['type']
+            result['vehicleCategory'] = vehicle_info['category']
+            result['vehicleConfidence'] = vehicle_info['confidence']
+        else:
+            result['vehicleType'] = '未知'
+            result['vehicleCategory'] = 'OTHER'
+            result['vehicleConfidence'] = 0
+        
+        plate_results.append(result)
     
     return plate_results
 
@@ -95,15 +151,21 @@ def draw_results(image_array, results):
     
     try:
         font = ImageFont.truetype(FONT_PATH, 30)
+        small_font = ImageFont.truetype(FONT_PATH, 20)
     except:
         font = ImageFont.load_default()
+        small_font = font
     
     for result in results:
         x1, y1, x2, y2 = result['location']
         plate_number = result['plateNumber']
+        vehicle_type = result.get('vehicleType', '')
         
         draw.rectangle([x1, y1, x2, y2], outline=(255, 0, 0), width=2)
         draw.text((x1, y1 - 35), plate_number, fill=(255, 0, 0), font=font)
+        
+        if vehicle_type and vehicle_type != '未知':
+            draw.text((x1, y2 + 5), f'车型: {vehicle_type}', fill=(0, 128, 0), font=small_font)
     
     return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
@@ -215,6 +277,9 @@ def recognize():
                 'confidence': results[0]['confidence'],
                 'plateColor': results[0]['plateColor'],
                 'plateType': results[0]['plateType'],
+                'vehicleType': results[0].get('vehicleType', '未知'),
+                'vehicleCategory': results[0].get('vehicleCategory', 'OTHER'),
+                'vehicleConfidence': results[0].get('vehicleConfidence', 0),
                 'allResults': results,
                 'processTime': round(process_time, 3)
             })
@@ -262,6 +327,9 @@ def recognize_base64():
                 'confidence': results[0]['confidence'],
                 'plateColor': results[0]['plateColor'],
                 'plateType': results[0]['plateType'],
+                'vehicleType': results[0].get('vehicleType', '未知'),
+                'vehicleCategory': results[0].get('vehicleCategory', 'OTHER'),
+                'vehicleConfidence': results[0].get('vehicleConfidence', 0),
                 'allResults': results,
                 'processTime': round(process_time, 3)
             })
@@ -309,6 +377,9 @@ def recognize_with_image():
                 'confidence': results[0]['confidence'],
                 'plateColor': results[0]['plateColor'],
                 'plateType': results[0]['plateType'],
+                'vehicleType': results[0].get('vehicleType', '未知'),
+                'vehicleCategory': results[0].get('vehicleCategory', 'OTHER'),
+                'vehicleConfidence': results[0].get('vehicleConfidence', 0),
                 'allResults': results,
                 'resultImage': result_image_base64,
                 'processTime': round(process_time, 3)

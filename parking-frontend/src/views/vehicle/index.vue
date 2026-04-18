@@ -146,7 +146,15 @@
               </template>
             </el-table-column>
             <el-table-column prop="plateColor" label="车牌颜色" width="100" />
-            <el-table-column prop="plateType" label="车型" width="100" />
+            <el-table-column prop="plateType" label="车牌类型" width="100" />
+            <el-table-column prop="vehicleType" label="车型" width="100">
+              <template #default="{ row }">
+                <el-tag v-if="row.vehicleType" :type="row.vehicleType !== '未知' ? 'success' : 'info'" size="small">
+                  {{ row.vehicleType || '未知' }}
+                </el-tag>
+                <span v-else class="text-gray">-</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="confidence" label="置信度" width="100">
               <template #default="{ row }">
                 {{ row.confidence ? row.confidence + '%' : '-' }}
@@ -206,13 +214,21 @@
         </el-descriptions-item>
         <el-descriptions-item label="置信度">{{ recognitionResult.confidence }}%</el-descriptions-item>
         <el-descriptions-item label="车牌颜色">{{ recognitionResult.plateColor }}</el-descriptions-item>
-        <el-descriptions-item label="车型">{{ recognitionResult.plateType }}</el-descriptions-item>
+        <el-descriptions-item label="车牌类型">{{ recognitionResult.plateType }}</el-descriptions-item>
+        <el-descriptions-item label="车型识别">
+          <el-tag :type="recognitionResult.vehicleType !== '未知' ? 'success' : 'info'">
+            {{ recognitionResult.vehicleType }}
+          </el-tag>
+          <span v-if="recognitionResult.vehicleConfidence > 0" style="margin-left: 8px; color: #909399;">
+            (置信度: {{ recognitionResult.vehicleConfidence }}%)
+          </span>
+        </el-descriptions-item>
         <el-descriptions-item label="分类">
           <el-select v-model="selectedCategory" placeholder="选择分类">
             <el-option label="轿车" value="SEDAN" />
             <el-option label="SUV" value="SUV" />
             <el-option label="卡车" value="TRUCK" />
-            <el-option label="客车" value="BUS" />
+            <el-option label="客车/公交车" value="BUS" />
             <el-option label="新能源" value="NEW_ENERGY" />
             <el-option label="其他" value="OTHER" />
           </el-select>
@@ -299,16 +315,24 @@
         </el-descriptions>
         <el-empty v-if="videoResult.results.length === 0" description="未检测到车牌" style="margin-top: 16px;" />
         <el-table v-else :data="videoResult.results" style="margin-top: 16px;" max-height="300">
-          <el-table-column prop="plateNumber" label="车牌号" width="150">
+          <el-table-column prop="plateNumber" label="车牌号" width="130">
             <template #default="{ row }">
               <el-tag type="primary">{{ row.plateNumber }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="plateColor" label="颜色" width="100" />
-          <el-table-column prop="confidence" label="置信度" width="100">
+          <el-table-column prop="plateColor" label="颜色" width="80" />
+          <el-table-column prop="vehicleType" label="车型" width="80">
+            <template #default="{ row }">
+              <el-tag v-if="row.vehicleType" :type="row.vehicleType !== '未知' ? 'success' : 'info'" size="small">
+                {{ row.vehicleType || '未知' }}
+              </el-tag>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="confidence" label="置信度" width="80">
             <template #default="{ row }">{{ row.confidence }}%</template>
           </el-table-column>
-          <el-table-column prop="timestamp" label="时间点" width="100">
+          <el-table-column prop="timestamp" label="时间点" width="80">
             <template #default="{ row }">{{ row.timestamp }}s</template>
           </el-table-column>
           <el-table-column label="操作">
@@ -380,6 +404,9 @@ const recognitionResult = reactive({
   confidence: 0,
   plateColor: '',
   plateType: '',
+  vehicleType: '',
+  vehicleCategory: '',
+  vehicleConfidence: 0,
   resultImage: null
 })
 
@@ -481,9 +508,12 @@ const handleImageDetect = async (file) => {
         confidence: data.confidence || 0,
         plateColor: data.plateColor || '',
         plateType: data.plateType || '',
+        vehicleType: data.vehicleType || '未知',
+        vehicleCategory: data.vehicleCategory || 'OTHER',
+        vehicleConfidence: data.vehicleConfidence || 0,
         resultImage: data.resultImage || null
       })
-      selectedCategory.value = data.plateColor?.includes('绿') ? 'NEW_ENERGY' : 'SEDAN'
+      selectedCategory.value = data.vehicleCategory || (data.plateColor?.includes('绿') ? 'NEW_ENERGY' : 'SEDAN')
       
       const recordFormData = new FormData()
       recordFormData.append('image', file)
@@ -692,6 +722,7 @@ const addVideoResultToRecords = async (result) => {
       plateNumber: result.plateNumber,
       plateColor: result.plateColor,
       plateType: result.plateType,
+      vehicleType: result.vehicleType,
       confidence: result.confidence,
       source: '视频检测',
       image: imageFile

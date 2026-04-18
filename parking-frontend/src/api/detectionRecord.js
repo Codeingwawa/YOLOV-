@@ -14,6 +14,7 @@ export function addDetectionRecord(data) {
   formData.append('plateNumber', data.plateNumber)
   if (data.plateColor) formData.append('plateColor', data.plateColor)
   if (data.plateType) formData.append('plateType', data.plateType)
+  if (data.vehicleType) formData.append('vehicleType', data.vehicleType)
   if (data.confidence) formData.append('confidence', data.confidence)
   if (data.source) formData.append('source', data.source)
   if (data.image) formData.append('image', data.image)

@@ -8,4 +8,7 @@ public class PlateRecognitionResult {
     private Double confidence;
     private String plateColor;
     private String plateType;
+    private String vehicleType;
+    private String vehicleCategory;
+    private Double vehicleConfidence;
 }

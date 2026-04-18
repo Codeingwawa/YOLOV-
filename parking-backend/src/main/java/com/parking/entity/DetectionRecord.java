@@ -22,6 +22,9 @@ public class DetectionRecord {
     @Column(length = 50)
     private String plateType;
     
+    @Column(length = 20)
+    private String vehicleType;
+    
     private Double confidence;
     
     @Column(length = 20)
