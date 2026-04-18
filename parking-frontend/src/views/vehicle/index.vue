@@ -38,8 +38,13 @@
             </el-form-item>
             <el-form-item label="车型">
               <el-select v-model="searchForm.vehicleType" placeholder="请选择车型" clearable style="width: 150px">
-                <el-option label="新能源" value="新能源" />
-                <el-option label="普通" value="普通" />
+                <el-option label="轿车" value="轿车" />
+                <el-option label="SUV" value="SUV" />
+                <el-option label="卡车" value="卡车" />
+                <el-option label="大巴/公交车" value="大巴" />
+                <el-option label="面包车" value="面包车" />
+                <el-option label="摩托车" value="摩托车" />
+                <el-option label="其他" value="其他" />
               </el-select>
             </el-form-item>
             <el-form-item label="分类">
@@ -244,7 +249,15 @@
           <el-input v-model="editForm.plateColor" />
         </el-form-item>
         <el-form-item label="车型">
-          <el-input v-model="editForm.vehicleType" />
+          <el-select v-model="editForm.vehicleType" placeholder="请选择车型">
+            <el-option label="轿车" value="轿车" />
+            <el-option label="SUV" value="SUV" />
+            <el-option label="卡车" value="卡车" />
+            <el-option label="大巴/公交车" value="大巴" />
+            <el-option label="面包车" value="面包车" />
+            <el-option label="摩托车" value="摩托车" />
+            <el-option label="其他" value="其他" />
+          </el-select>
         </el-form-item>
         <el-form-item label="车辆品牌">
           <el-input v-model="editForm.vehicleBrand" />
