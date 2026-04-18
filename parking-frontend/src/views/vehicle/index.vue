@@ -147,7 +147,6 @@
               </template>
             </el-table-column>
             <el-table-column prop="plateColor" label="车牌颜色" width="100" />
-            <el-table-column prop="plateType" label="车牌类型" width="100" />
             <el-table-column prop="vehicleType" label="车型" width="100">
               <template #default="{ row }">
                 <el-tag v-if="row.vehicleType" :type="row.vehicleType !== '未知' ? 'success' : 'info'" size="small">
