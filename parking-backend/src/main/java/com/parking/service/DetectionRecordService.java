@@ -161,7 +161,7 @@ public class DetectionRecordService {
             if (category != null && !category.isEmpty()) {
                 vehicleInfo.setCategory(VehicleCategory.valueOf(category));
             } else {
-                vehicleInfo.setCategory(determineCategory(record.getPlateColor()));
+                vehicleInfo.setCategory(determineCategory(record.getPlateColor(), record.getVehicleType()));
             }
             
             ParkingSpace availableSpace = findAvailableSpace(vehicleInfo.getCategory());
@@ -221,10 +221,19 @@ public class DetectionRecordService {
             .orElse(availableSpaces.get(0));
     }
     
-    private VehicleCategory determineCategory(String plateColor) {
-        if (plateColor == null) return VehicleCategory.OTHER;
-        if (plateColor.contains("绿")) return VehicleCategory.NEW_ENERGY;
-        return VehicleCategory.SEDAN;
+    private VehicleCategory determineCategory(String plateColor, String vehicleType) {
+        if (vehicleType != null) {
+            if (vehicleType.contains("卡车") || vehicleType.equalsIgnoreCase("TRUCK")) {
+                return VehicleCategory.TRUCK;
+            }
+            if (vehicleType.contains("公交") || vehicleType.contains("大巴") || vehicleType.equalsIgnoreCase("BUS")) {
+                return VehicleCategory.BUS;
+            }
+        }
+        if (plateColor != null && plateColor.contains("绿")) {
+            return VehicleCategory.NEW_ENERGY;
+        }
+        return VehicleCategory.FUEL;
     }
     
     @Transactional

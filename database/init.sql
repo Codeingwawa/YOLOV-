@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS vehicle_info (
     confidence DECIMAL(5, 2) COMMENT '识别置信度',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '录入时间',
     updated_at DATETIME COMMENT '更新时间',
-    category ENUM('SEDAN', 'SUV', 'TRUCK', 'BUS', 'MOTORCYCLE', 'NEW_ENERGY', 'OTHER') DEFAULT 'SEDAN' COMMENT '车辆分类',
+    category ENUM('NEW_ENERGY', 'FUEL', 'TRUCK', 'BUS', 'OTHER') DEFAULT 'FUEL' COMMENT '车辆分类',
     remarks VARCHAR(500) COMMENT '备注',
     INDEX idx_plate_number (plate_number),
     INDEX idx_category (category),

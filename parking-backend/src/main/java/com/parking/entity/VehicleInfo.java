@@ -55,12 +55,10 @@ public class VehicleInfo {
     private LocalDateTime parkingEndTime;
     
     public enum VehicleCategory {
-        SEDAN,
-        SUV,
+        NEW_ENERGY,
+        FUEL,
         TRUCK,
         BUS,
-        MOTORCYCLE,
-        NEW_ENERGY,
         OTHER
     }
     

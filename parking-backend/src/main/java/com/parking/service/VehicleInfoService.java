@@ -73,9 +73,8 @@ public class VehicleInfoService {
     }
     
     private VehicleCategory determineCategory(String plateColor) {
-        if (plateColor == null) return VehicleCategory.OTHER;
-        if (plateColor.contains("绿")) return VehicleCategory.NEW_ENERGY;
-        return VehicleCategory.SEDAN;
+        if (plateColor != null && plateColor.contains("绿")) return VehicleCategory.NEW_ENERGY;
+        return VehicleCategory.FUEL;
     }
     
     public PlateRecognitionResult recognizePlate(String imagePath) {
